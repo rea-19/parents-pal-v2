@@ -1,0 +1,377 @@
+/* Main styles for the website: navbar, footer, content */
+body {
+    background-color: #AFD0AC;
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    color: #222;
+    line-height: 1.6;
+}
+
+.checked {
+    color: orange;
+    font-size: 20px;
+    margin-right: 3px;
+}
+
+.event-details{
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  grid-template-rows: auto 1fr;
+  gap: 20px;
+  padding: 20px;
+}
+
+#navbar {
+    background-color: #216462;
+    color: #ffff;
+    width: 100%;
+    overflow: auto;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.2)
+}
+
+#navbar-links a:first-child {
+    flex: 0 0 60px; 
+    padding: 0;
+}
+
+#navbar-logo {
+    height: 5rem;
+    width: 5rem;
+    margin-right: 10px;
+    margin-left: 10px;
+}
+
+#navbar-logo a:hover{
+  color: #FED729;
+}
+
+#navbar-links {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+}
+
+#navbar-links a {
+    flex: 1;
+    color: white;
+    text-decoration: none;
+    font-weight: bold;
+    font-size: 17px;
+    text-align: center;
+    position: relative;
+    padding: 12px 20px;
+    flex: 1 1 0; 
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: color 0.3 ease;
+}
+
+#navbar-links a:hover {
+  color: #FED729
+}
+
+#navbar-links a:not(:last-child)::after {
+    content: "";
+    position: absolute;
+    right: 0;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 2px;
+    height: 24px;
+    background: #287976;
+}
+
+#navbar-links a:first-child {
+    flex:1;
+    padding: 12px 20px;
+}
+/* Progress Bar */
+#progress-bar {
+    background-color: #FDF5D2;
+    display: flex;
+    align-items: center;
+    height: 22px;
+    width: 100%;
+    margin: 0;
+    position: relative;
+    justify-content: flex-end;
+}
+
+#progress-fill {
+    background-color: #FED729;
+    height: 100%;
+    width: 60%;
+    position: absolute;
+    left: 0;
+    top: 0;
+    border-radius: 0 10px 10px 0;
+    z-index: 1;
+}
+
+#point-text {
+    font-style: italic;
+    margin-right: 30px;
+    color: #216462;
+    z-index: 2;
+    position: relative;
+}
+
+
+/*profile - Rewards Page formatting*/
+/* Membership Card */
+.card-section {
+  display: flex;
+  justify-content: center;
+  padding: 2rem;
+}
+
+.map-and-reviews {
+  display: flex;
+  gap: 25px;
+  height: 50vh;
+  margin: 0;
+  width: 100%;
+  align-items: stretch;
+}
+
+.map, #reviews {
+    flex: 1;
+    height: 100%
+}
+
+.map iframe {
+    width: 100%;
+    height: 100%;
+    border-radius: 12px;
+    border: none;
+}
+
+.map {
+  border: none;
+  border-radius: 12px;
+  box-shadow: 0 3px 10px rgba(0,0,0,0.15)
+}
+
+.membership-card {
+  background: white;
+  border-radius: 10px;
+  padding: 1.5rem;
+  position: relative;
+  width: 350px;
+  text-align: center;
+}
+
+.points-badge {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  background: gold;
+  padding: 0.5rem 1rem;
+  border-radius: 5px;
+  font-weight: bold;
+}
+
+.wallet-btn {
+  margin-top: 1rem;
+  padding: 0.5rem 1rem;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: box-shadow 0.3s ease;
+}
+
+.wallet-btn:hover {
+  box-shadow: 0px 4px 10px rgba(0,0,0,0.2);
+}
+
+/* Info Banner */
+.info-banner {
+  text-align: center;
+  padding: 1.5rem;
+}
+
+/* Rewards */
+.rewards {
+  text-align: center;
+  padding: 2rem;
+}
+
+.rewards-grid {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 1.5rem;
+  margin-top: 2rem;
+}
+
+.reward-card {
+  background: white;
+  border-radius: 12px;
+  width: 150px;
+  padding: 1.5rem;
+  text-align: center;
+  transition: transform 0.2s ease;
+}
+
+.reward-card:hover {
+  transform: translateY(-5px);
+}
+
+.goal-btn {
+  margin-top: 1rem;
+  padding: 0.5rem 1rem;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: box-shadow 0.3s ease;
+}
+
+.goal-btn:hover {
+  box-shadow: 0px 4px 10px rgba(0,0,0,0.25);
+}
+
+/* Footer */
+#footer {
+    content: "";
+    display: table;
+    clear: both;
+    background-color: #216462;
+    color: #fff;
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    padding: 30px 40px;
+    margin-top: 20px;
+}
+
+.footer-column {
+    float: left;
+    width: 50%;
+    flex: 50%;
+}
+
+.footer-headline {
+    font-size: 1.3em;
+    margin-bottom: 12px;
+    color: #FED729;
+}
+
+#footer ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+#footer ul li {
+    margin-bottom: 10px;
+}
+
+#footer a {
+    color: #fff;
+    text-decoration: none;
+    transition: color 0.2s;
+}
+
+#reviews{
+    padding: 20px;
+    background-color: #fff;
+    border-radius: 12px;
+    box-shadow: 0 3px 10px rgba(0,0,0,0.15);
+    overflow-y: auto;
+}
+
+.reviews-heading{
+    letter-spacing: 1px;
+    margin: 10px 0px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+.reviews-heading h1{
+    font-size: 2.2rem;
+    font-weight: 500;
+    background-color: #113213;
+    color: #ffffff;
+    padding: 10px 20px;
+}
+
+.reviews-box-container{
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+.reviews-box-container .reviews-box {
+  margin-bottom: 15px;
+}
+.reviews-box{
+    width:100%;
+}
+.profile{
+    display: flex;
+    align-items: center;
+}
+.name-user{
+    display: flex;
+    flex-direction: column;
+}
+.name-user strong{
+    color: #3d3d3d;
+    font-size: 1.1rem;
+    letter-spacing: 0.5px;
+}
+.name-user span{
+    color: #979797;
+    font-size: 0.8rem;
+}
+.reviews{
+    color: #f9d71c;
+}
+.box-top{
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+}
+.client-comment p{
+    font-size: 0.9rem;
+    color: #4b4b4b;
+}
+.review-box:hover{
+    transform: translateY(-10px);
+    transition: all ease 0.3s;
+}
+ 
+@media(max-width:1060px){
+    .review-box{
+        width:45%;
+        padding: 10px;
+    }
+}
+@media(max-width:790px){
+    .review-box{
+        width:100%;
+    }
+    .review-heading h1{
+        font-size: 1.4rem;
+    }
+}
+@media(max-width:340px){
+    .box-top{
+        flex-wrap: wrap;
+        margin-bottom: 10px;
+    }
+    .reviews{
+        margin-top: 10px;
+    }
+}
+::selection{
+    color: #ffffff;
+    background-color: #252525;
+}
+ 
+
+
