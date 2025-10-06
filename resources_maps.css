@@ -1,0 +1,37 @@
+.layout {
+    display: flex;
+    flex-direction: row;
+    height: 100vh;
+    gap: 0;
+}
+
+#map-container {
+    margin-top: 75px;
+    flex: 1;
+    height: 100%;
+}
+
+#map-pic {
+    margin-right: 150px;
+}
+
+.sidebar {
+    width: 200px;
+    background-color: #AFD0AC;
+    display: flex;
+    flex-direction: column;
+    padding: 1rem;
+    box-shadow: -2px 0 5px rgba(0,0,0,0.1);
+}
+
+.sidebar-btn {
+    margin-top: 35px;
+    margin-bottom: 1rem;
+    padding: 0.75rem;
+    font-size: 1rem;
+    border: none;
+    background-color: rgba(33,100,98);
+    color: white;
+    border-radius: 5px;
+    cursor: pointer; 
+}
