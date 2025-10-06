@@ -1,6 +1,6 @@
 /* Main styles for the website: navbar, footer, content */
 body {
-    background-color: #AFD0AC;
+    background-color: #ffff;
     font-family: Arial, sans-serif;
     margin: 0;
     padding: 0;
@@ -22,13 +22,20 @@ body {
   padding: 20px;
 }
 
+#header {
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+
+}
+
 #navbar {
     background-color: #216462;
     color: #ffff;
     width: 100%;
-    overflow: auto;
-    box-shadow: 0 2px 6px rgba(0,0,0,0.2)
+    box-shadow: 0 2px 6px rgba(0,0,0,0.2);
 }
+
 
 #navbar-links a:first-child {
     flex: 0 0 60px; 

@@ -1,13 +1,122 @@
+$(".filter-box").click(function(e){
+    e.stopPropagation();
+    $(".filter-box").not(this).removeClass("active");
+    $(this).toggleClass("active");
+
+    const dropdown = $(this).find(".checkbox-dropdown");
+    if(dropdown.length){
+        const offset = $(this).offset();
+        dropdown.css({
+            top: offset.top + $(this).outerHeight() + 4 + "px", // slightly below
+            left: offset.left + "px",
+            width: $(this).outerWidth() + "px"
+        });
+    }
+});
+
+$(document).click(function(){
+    $(".filter-box").removeClass("active");
+});
+
+
+
+$("body").click(function(){
+    $(".filter-box").removeClass("active");
+});
+
+function renderSelectedFilters() {
+    const container = $("#selected-filters");
+    container.empty();
+
+    $("#age option:selected").each(function() {
+        const val = $(this).val();
+        const tag = $('<div class="filter-tag"><span>Age: ' + val + '</span><button>&times;</button></div>');
+        tag.find("button").click(function() {
+            $(this).parent().remove();
+            $(this).parent().remove(); 
+            $("#age option[value='" + val + "']").prop("selected", false);
+            filterEvents();
+        });
+        container.append(tag);
+    });
+
+    const costSlider = $("#cost-slider").data("ionRangeSlider");
+    if(costSlider){
+        const val = `$${costSlider.result.from} - $${costSlider.result.to}`;
+        const tag = $('<div class="filter-tag"><span>Cost: ' + val + '</span><button>&times;</button></div>');
+        tag.find("button").click(function() {
+            costSlider.update({from: costSlider.options.min, to: costSlider.options.max});
+            filterEvents();
+            renderSelectedFilters();
+        });
+        container.append(tag);
+    }
+
+    $(".checkbox-dropdown input[type='checkbox']:checked").each(function() {
+        const val = $(this).val();
+        const tag = $('<div class="filter-tag"><span>Activity: ' + val + '</span><button>&times;</button></div>');
+        tag.find("button").click(function() {
+            $(this).parent().remove();
+            $(".checkbox-dropdown input[type='checkbox'][value='" + val + "']").prop("checked", false);
+            filterEvents();
+            renderSelectedFilters();
+        });
+        container.append(tag);
+    });
+
+    const suburbVal = $("#suburb").val();
+    if(suburbVal) {
+        const tag = $('<div class="filter-tag"><span>Suburb: ' + suburbVal + '</span><button>&times;</button></div>');
+        tag.find("button").click(function() {
+            $("#suburb").val('');
+            filterEvents();
+            renderSelectedFilters();
+        });
+        container.append(tag);
+    }
+
+    const dateVal = $("#date-range").val();
+    if(dateVal) {
+        const tag = $('<div class="filter-tag"><span>Date: ' + dateVal + '</span><button>&times;</button></div>');
+        tag.find("button").click(function() {
+            $("#date-range").val('');
+            filterEvents();
+            renderSelectedFilters();
+        });
+        container.append(tag);
+    }
+}
+
+
+$(document).ready(function(){
+    $("#age, #suburb, #cost-slider").on("change input", function(){
+        filterEvents();
+        renderSelectedFilters();
+    });
+    $(".checkbox-dropdown input[type='checkbox']").on("change", function(){
+        filterEvents();
+        renderSelectedFilters();
+    });
+    flatpickr("#date-range", {
+        mode:"range",
+        dateFormat:"Y-m-d",
+        onClose: function() {
+            filterEvents();
+            renderSelectedFilters();
+        }
+    });
+});
+
+
 let allFetchedRecords = [];
 
-// Wrap iterateRecords to store fetched records
 const originalIterateRecords = window.iterateRecords;
 window.iterateRecords = function(data) {
     allFetchedRecords = allFetchedRecords.concat(data.results);
     originalIterateRecords(data);
 };
 
-// --- Helper to parse age strings from API into numeric ranges (years) ---
+
 function parseAgeRange(str) {
     str = str.toLowerCase();
 
@@ -42,33 +151,35 @@ function parseAgeRange(str) {
     return [min, max];
 }
 
-// --- Helper to check if two ranges overlap ---
 function rangesOverlap(min1, max1, min2, max2){
     return Math.max(min1, min2) <= Math.min(max1, max2);
 }
 
-// --- Filtering function ---
+
 function filterEvents() {
     if(allFetchedRecords.length === 0) return; // nothing to filter yet
 
     const selectedAges = $("#age").val() || [];
-    const selectedCost = $("#cost").val();
-    const selectedActivities = $("#activity").val() || [];
+    const costSlider = $("#cost-slider").data("ionRangeSlider");
+    const costMin = costSlider ? costSlider.result.from : 0;
+    const costMax = costSlider ? costSlider.result.to : 200;
+    const selectedActivities = $(".checkbox-dropdown input[type='checkbox']:checked").map(function(){
+        return $(this).val();
+    }).get();
     const suburbInput = $("#suburb").val().toLowerCase();
     const dateRange = $("#date-range").val().split(" to ");
-let startDate = dateRange[0] ? new Date(dateRange[0]) : null;
-let endDate = dateRange[1] ? new Date(dateRange[1]) : null;
+    let startDate = dateRange[0] ? new Date(dateRange[0]) : null;
+    let endDate = dateRange[1] ? new Date(dateRange[1]) : null;
 
-// If only one date selected, set endDate to same day 11:59pm
-if(startDate && !endDate){
-    endDate = new Date(startDate);
-    endDate.setHours(23,59,59,999);
+    // If only one date selected, set endDate to same day 11:59pm
+    if(startDate && !endDate){
+        endDate = new Date(startDate);
+        endDate.setHours(23,59,59,999);
 }
 
 
     
     const filtered = allFetchedRecords.filter(event => {
-        // --- AGE ---
         if(selectedAges.length && event.age){
             const [eventMin, eventMax] = parseAgeRange(event.age);
             const matches = selectedAges.some(sel => {
@@ -80,32 +191,25 @@ if(startDate && !endDate){
             if(!matches) return false;
         }
 
-        // --- COST ---
-        if(selectedCost && event.cost) {
-            const costValue = parseInt(event.cost.replace(/[^0-9]/g,'')) || 0;
-            switch(selectedCost){
-                case "free": if(costValue!==0) return false; break;
-                case "10-15": if(costValue<10||costValue>15) return false; break;
-                case "20-25": if(costValue<20||costValue>25) return false; break;
-                case "30-35": if(costValue<30||costValue>35) return false; break;
-                case "40+": if(costValue<40) return false; break;
-            }
-        }
+        if(event.cost) {
+            const costValue = parseFloat(event.cost.replace(/[^0-9.]/g,'')) || 0;
+            if(costValue < costMin || costValue > costMax) return false;
+        }       
 
-        // --- ACTIVITY ---
         if(selectedActivities.length && event.event_type) {
             if(!selectedActivities.some(act => event.event_type.includes(act))) return false;
         }
 
-        // --- SUBURB ---
+        if(selectedActivities.length && event.event_type) {
+            if(!selectedActivities.some(act => event.event_type.includes(act))) return false;
+        }
         if(suburbInput && event.venueaddress) {
-    // Split venueaddress by commas, trim spaces, lowercase
-    const parts = event.venueaddress.split(",").map(p => p.trim().toLowerCase());
-    const eventSuburb = parts[parts.length - 1]; // last part is usually the suburb
-    if(!eventSuburb.includes(suburbInput.toLowerCase())) return false;
-}
+        // Split venueaddress by commas, trim spaces, lowercase
+            const parts = event.venueaddress.split(",").map(p => p.trim().toLowerCase());
+            const eventSuburb = parts[parts.length - 1]; // last part is usually the suburb
+            if(!eventSuburb.includes(suburbInput.toLowerCase())) return false;
+        }
 
-        // --- DATE ---
         if(startDate && endDate && event.start_datetime) {
             const evDate = new Date(event.start_datetime);
             if(evDate < startDate || evDate > endDate) return false;
@@ -118,12 +222,14 @@ if(startDate && !endDate){
     originalIterateRecords({results: filtered});
 }
 
-// --- Attach listeners ---
+
 $(document).ready(function(){
-    $("#age, #cost, #activity, #suburb").on("change input", filterEvents);
+    $("#age, #suburb, #cost-slider").on("change input", filterEvents);
+    $(".checkbox-dropdown input[type='checkbox']").on("change", filterEvents);
     flatpickr("#date-range", {
         mode:"range",
         dateFormat:"Y-m-d",
         onClose: filterEvents
     });
 });
+

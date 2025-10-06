@@ -1,23 +1,21 @@
 function iterateRecords(data) {
+    console.log("Data returned: " + JSON.stringify(data));
 
-	console.log("Data returned: "+JSON.stringify(data));
-	
-	var records = data.results;
+    var records = data.results;
 
-
-	Object.values(records).forEach(value => {
-		var subject = value["subject"];
-		var description = value["description"];
-		var location = value["location"];
+    Object.values(records).forEach(value => {
+        var subject = value["subject"];
+        var location = value["location"];
         var date = value["formatteddatetime"];
         var age = value["age"];
+        var image = value["eventimage"];
 
-		// Filter out events for young adults, adults, seniors
+        // Filter out events for young adults, adults, seniors
         if (!age || /young adult|adult|senior/i.test(age)) {
-            return; 
+            return;
         }
-		
-        // add points and price indicator depending on the cost of the event
+
+        // Cost and points calculation
         var rawCost = value["cost"];
         var points = 0;
         var priceLabel = "N/A";
@@ -25,12 +23,10 @@ function iterateRecords(data) {
         if (rawCost) {
             let price = rawCost.toLowerCase() === "free" ? 0 : parseInt(rawCost.replace(/[^0-9]/g, ''), 10) || 0;
 
-            // Points
             if (price === 0) points = 1;
             else if (price <= 10) points = 2;
             else if (price > 10) points = 3;
 
-            // Price label
             if (price === 0) priceLabel = "$";
             else if (price <= 10) priceLabel = "$$";
             else if (price > 10) priceLabel = "$$$";
@@ -38,53 +34,84 @@ function iterateRecords(data) {
 
         var price = priceLabel;
 
+        // Create the record only if required fields exist
+        if (subject && location && date && age && price && points) {
+            const recordSection = $('<section class="record">');
 
-		// check that we have data for each of the fields we want to display
-		if(subject && description && location && date && age && price && points) {
-            $("#records").append(
-                $('<section class="record">').append(
+            recordSection.append(
+                image ? $('<img>').attr('src', image).attr('alt', subject).css({
+                    'width': '100%',
+                    'border-radius': '16px',
+                    'margin-bottom': '10px',
+                    'object-fit': 'cover',
+                    'max-height': '250px'
+                }) : null,
+
+                $('<div class="record-header">').append(
                     $('<h2>').text(subject),
-                    $('<p>').text(description),
-                    $('<p>').text(location),
-                    $('<p>').text(age),
-                    $('<p>').text(date),
-                    $('<p>').text(price),
-                    $('<p>').text("Points: "+points),
-                    $('<button class="view-more">')
-						.text("View More")
-						.click(function() {
-							const params = new URLSearchParams({
-							subject: subject,
-							start: value["start_datetime"],
-							end: value["end_datetime"]
-							});
+                    $('<span class="price-label">').text(price)
+                ),
 
-							window.location.href = "/html/event_details.html?" + params.toString();
-						})
-                    )
-                );
-		}
-	});
+                $('<div class="record-tags">').append(
+                    $('<span class="tag">').text(location),
+                    $('<span class="tag">').text(age),
+                    $('<span class="tag">').text(date),
+                    $('<span class="tag">').text("Points: " + points)
+                )
+            );
+
+            // Make the whole record clickable
+            recordSection.click(function () {
+                const params = new URLSearchParams({
+                    subject: subject,
+                    start: value["start_datetime"],
+                    end: value["end_datetime"]
+                });
+                window.location.href = "/html/event_details.html?" + params.toString();
+            });
+
+            $("#records").append(recordSection);
+        }
+    });
 }
 
+$(document).ready(function () {
+    const apiURLs = [
+        "https://data.brisbane.qld.gov.au/api/explore/v2.1/catalog/datasets/infants-and-toddlers-events/records",
+        "https://data.brisbane.qld.gov.au/api/explore/v2.1/catalog/datasets/library-events/records"
+    ];
 
-$(document).ready(function() {
-	const apiURLs = [
-		"https://data.brisbane.qld.gov.au/api/explore/v2.1/catalog/datasets/infants-and-toddlers-events/records",
-		"https://data.brisbane.qld.gov.au/api/explore/v2.1/catalog/datasets/library-events/records"
-	];
+    const requestParams = { limit: 50 };
+    const queryString = new URLSearchParams(requestParams).toString();
 
-	const requestParams = { limit: 50 };
-	const queryString = new URLSearchParams(requestParams).toString();
+    apiURLs.forEach(apiURL => {
+        const fullURL = apiURL + "?" + queryString;
+        console.log("Fetching: " + fullURL);
 
-	apiURLs.forEach(apiURL => {
-		const fullURL = apiURL + "?" + queryString;
-		console.log("Fetching: " + fullURL);
-
-		fetch(fullURL)
-			.then(response => response.json())
-			.then(data => iterateRecords(data))
-			.catch(error => console.error("Error fetching data from " + apiURL, error));
-	});
+        fetch(fullURL)
+            .then(response => response.json())
+            .then(data => iterateRecords(data))
+            .catch(error => console.error("Error fetching data from " + apiURL, error));
+    });
 });
 
+
+$(document).ready(function () {
+    const apiURLs = [
+        "https://data.brisbane.qld.gov.au/api/explore/v2.1/catalog/datasets/infants-and-toddlers-events/records",
+        "https://data.brisbane.qld.gov.au/api/explore/v2.1/catalog/datasets/library-events/records"
+    ];
+
+    const requestParams = { limit: 50 };
+    const queryString = new URLSearchParams(requestParams).toString();
+
+    apiURLs.forEach(apiURL => {
+        const fullURL = apiURL + "?" + queryString;
+        console.log("Fetching: " + fullURL);
+
+        fetch(fullURL)
+            .then(response => response.json())
+            .then(data => iterateRecords(data))
+            .catch(error => console.error("Error fetching data from " + apiURL, error));
+    });
+});
